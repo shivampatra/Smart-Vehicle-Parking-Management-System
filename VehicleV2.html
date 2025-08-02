@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking Zone - Vehicle Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        .header-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo-container {
+            text-align: center;
+            color: white;
+        }
+
+        .icon-large {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Stats Dashboard */
+        .stats-dashboard {
+            margin-bottom: 2rem;
+        }
+
+        .stats-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-icon {
+            font-size: 2.5rem;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .card-total .stats-icon { background: linear-gradient(45deg, #667eea, #764ba2); }
+        .card-parked .stats-icon { background: linear-gradient(45deg, #f093fb, #f5576c); }
+        .card-exited .stats-icon { background: linear-gradient(45deg, #4facfe, #00f2fe); }
+        .card-available .stats-icon { background: linear-gradient(45deg, #43e97b, #38f9d7); }
+
+        .stats-content {
+            flex: 1;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            line-height: 1;
+        }
+
+        .stats-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Cards */
+        .form-card, .visual-card, .records-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border: none;
+        }
+
+        .card-header h3 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Form Styling */
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Parking Grid */
+        .parking-visual {
+            padding: 2rem;
+        }
+
+        .parking-lot {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 2px dashed #dee2e6;
+        }
+
+        .parking-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .parking-spot {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 45px;
+        }
+
+        .parking-spot.available {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: white;
+        }
+
+        .parking-spot.occupied {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .parking-spot:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .spot-number {
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        /* Visual Info */
+        .visual-info h4 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .visual-info p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .legend {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-color.available {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .legend-color.occupied {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        /* Table Styling */
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table {
+            margin: 0;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .table-header th {
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+
+        /* Search Section */
+        .search-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: -1rem -2rem 2rem -2rem;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            z-index: 10;
+        }
+
+        .search-box .form-control {
+            padding-left: 3rem;
+        }
+
+        /* Header Actions */
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Alert Styling */
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 1rem 1.5rem;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .parking-grid {
+                grid-template-columns: repeat(8, 1fr);
+                gap: 6px;
+            }
+            
+            .parking-spot {
+                min-height: 35px;
+            }
+            
+            .spot-number {
+                font-size: 0.6rem;
+            }
+            
+            .legend {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+            
+            .stats-card {
+                text-align: center;
+                flex-direction: column;
+            }
+            
+            .stats-icon {
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .parking-grid {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 4px;
+            }
+        }
+
+        /* Animation for new vehicles */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .table tbody tr {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Loading states */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-12 text-center">
+                    <div class="logo-container">
+                        <i class="fas fa-car icon-large"></i>
+                        <h1 class="main-title">Smart Parking Zone</h1>
+                        <p class="subtitle">Advanced Vehicle Management System with Real-time Spot Assignment</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container-fluid px-4">
+        <!-- Statistics Dashboard -->
+        <div class="stats-dashboard mb-5">
+            <div class="row g-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stats-card card-total">
+                        <div class="stats-icon">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number" id="totalVehicles">0</div>
+                            <div class="stats-label">Total Vehicles</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stats-card card-parked">
+                        <div class="stats-icon">
+                            <i class="fas fa-parking"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number" id="parkedVehicles">0</div>
+                            <div class="stats-label">Currently Parked</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stats-card card-exited">
+                        <div class="stats-icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number" id="exitedVehicles">0</div>
+                            <div class="stats-label">Exited Today</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stats-card card-available">
+                        <div class="stats-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number" id="availableSpots">100</div>
+                            <div class="stats-label">Available Spots</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row g-4">
+            <!-- Registration Form -->
+            <div class="col-xl-5 col-lg-6">
+                <div class="form-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-plus-circle me-2"></i>Vehicle Registration</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="alertContainer"></div>
+                        
+                        <form id="vehicleForm" class="needs-validation" novalidate>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="ownerName" placeholder="Owner Name" required>
+                                <label for="ownerName"><i class="fas fa-user me-2"></i>Owner Name</label>
+                                <div class="invalid-feedback">Please provide a valid owner name.</div>
+                            </div>
+                            
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="vehicleName" placeholder="Vehicle Name" required>
+                                <label for="vehicleName"><i class="fas fa-car me-2"></i>Vehicle Name</label>
+                                <div class="invalid-feedback">Please provide a valid vehicle name.</div>
+                            </div>
+                            
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="vehicleNumber" placeholder="Vehicle Number" style="text-transform: uppercase;" required>
+                                <label for="vehicleNumber"><i class="fas fa-hashtag me-2"></i>Vehicle Number</label>
+                                <div class="invalid-feedback">Please provide a valid vehicle number.</div>
+                            </div>
+                            
+                            <div class="form-floating mb-3">
+                                <input type="datetime-local" class="form-control" id="entryDate" required>
+                                <label for="entryDate"><i class="fas fa-clock me-2"></i>Entry Date & Time</label>
+                                <div class="invalid-feedback">Please select entry date and time.</div>
+                            </div>
+                            
+                            <div class="form-floating mb-4">
+                                <input type="datetime-local" class="form-control" id="exitDate">
+                                <label for="exitDate"><i class="fas fa-sign-out-alt me-2"></i>Exit Date & Time (Optional)</label>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-4">
+                                    <i class="fas fa-plus me-2"></i>Register Vehicle
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="clearForm()">
+                                    <i class="fas fa-eraser me-2"></i>Clear Form
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Section -->
+            <div class="col-xl-7 col-lg-6">
+                <div class="visual-card">
+                    <div class="parking-visual">
+                        <div class="parking-lot">
+                            <div class="parking-grid" id="parkingGrid">
+                                <!-- Parking spots will be generated here -->
+                            </div>
+                        </div>
+                        <div class="visual-info">
+                            <h4><i class="fas fa-info-circle me-2"></i>Smart Parking Management</h4>
+                            <p>Real-time tracking and management of 100 parking spaces with automatic spot assignment. Each vehicle gets a unique spot number for easy identification.</p>
+                            <div class="legend">
+                                <div class="legend-item">
+                                    <span class="legend-color occupied"></span>
+                                    <span>Occupied</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color available"></span>
+                                    <span>Available</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicle Records -->
+        <div class="records-section mt-5">
+            <div class="records-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3><i class="fas fa-list me-2"></i>Vehicle Records</h3>
+                    <div class="header-actions">
+                        <button class="btn btn-outline-light btn-sm me-2" onclick="parkingManager.exportData()">
+                            <i class="fas fa-download me-1"></i>Export
+                        </button>
+                        <button class="btn btn-outline-light btn-sm" onclick="parkingManager.clearAllData()">
+                            <i class="fas fa-trash me-1"></i>Clear All
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Search and Filter -->
+                    <div class="search-section mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <div class="search-box">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" class="form-control" id="searchInput" 
+                                           placeholder="Search by owner name, vehicle name, or number..." 
+                                           onkeyup="searchVehicles()">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="statusFilter" onchange="filterByStatus()">
+                                    <option value="">All Vehicles</option>
+                                    <option value="Parked">Currently Parked</option>
+                                    <option value="Exited">Exited Vehicles</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="vehicleTable">
+                            <thead class="table-header">
+                                <tr>
+                                    <th><i class="fas fa-user me-1"></i>Owner</th>
+                                    <th><i class="fas fa-car me-1"></i>Vehicle</th>
+                                    <th><i class="fas fa-hashtag me-1"></i>Number</th>
+                                    <th><i class="fas fa-sign-in-alt me-1"></i>Entry</th>
+                                    <th><i class="fas fa-sign-out-alt me-1"></i>Exit</th>
+                                    <th><i class="fas fa-info-circle me-1"></i>Status</th>
+                                    <th><i class="fas fa-cogs me-1"></i>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vehicleTableBody">
+                                <!-- Vehicle records will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exit Time Modal -->
+    <div class="modal fade" id="exitTimeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-clock me-2"></i>Set Exit Time</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating">
+                        <input type="datetime-local" class="form-control" id="modalExitTime">
+                        <label for="modalExitTime">Exit Date & Time</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmExit()">Confirm Exit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Enhanced Parking Management System with Spot Assignment
+        class ParkingManager {
+            constructor() {
+                this.vehicles = this.loadData() || [];
+                this.totalSpots = 100;
+                this.occupiedSpots = new Set(this.vehicles.filter(v => v.status === 'Parked').map(v => v.spotId));
+                this.initializeParkingGrid();
+                this.updateDisplay();
+                this.setCurrentDateTime();
+            }
+
+            loadData() {
+                try {
+                    const data = localStorage.getItem('parkingVehicles');
+                    return data ? JSON.parse(data) : [];
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    return [];
+                }
+            }
+
+            initializeParkingGrid() {
+                const parkingGrid = document.getElementById('parkingGrid');
+                parkingGrid.innerHTML = '';
+                
+                // Create 100 parking spots in a 10x10 grid
+                for (let i = 1; i <= this.totalSpots; i++) {
+                    const spot = document.createElement('div');
+                    spot.className = 'parking-spot';
+                    spot.setAttribute('data-spot', i);
+                    spot.innerHTML = `<span class="spot-number">${i}</span>`;
+                    
+                    // Check if spot is occupied
+                    if (this.occupiedSpots.has(i)) {
+                        spot.classList.add('occupied');
+                        // Find vehicle in this spot
+                        const vehicle = this.vehicles.find(v => v.spotId === i && v.status === 'Parked');
+                        if (vehicle) {
+                            spot.title = `Spot ${i} - ${vehicle.vehicleNumber} (${vehicle.ownerName})`;
+                        }
+                    } else {
+                        spot.classList.add('available');
+                        spot.title = `Spot ${i} - Available`;
+                    }
+                    
+                    parkingGrid.appendChild(spot);
+                }
+            }
+
+            getNextAvailableSpot() {
+                for (let i = 1; i <= this.totalSpots; i++) {
+                    if (!this.occupiedSpots.has(i)) {
+                        return i;
+                    }
+                }
+                return null; // No spots available
+            }
+
+            addVehicle(vehicleData) {
+                // Check if parking is full
+                if (this.occupiedSpots.size >= this.totalSpots) {
+                    this.showAlert('Parking is full! No available spots.', 'danger');
+                    return false;
+                }
+
+                // Check for duplicate vehicle numbers
+                const existingVehicle = this.vehicles.find(v => 
+                    v.vehicleNumber.toLowerCase() === vehicleData.vehicleNumber.toLowerCase() && 
+                    v.status === 'Parked'
+                );
+                
+                if (existingVehicle) {
+                    this.showAlert(`This vehicle is already parked in Spot #${existingVehicle.spotId}!`, 'warning');
+                    return false;
+                }
+
+                // Assign parking spot
+                const spotId = this.getNextAvailableSpot();
+                if (!spotId) {
+                    this.showAlert('No available parking spots!', 'danger');
+                    return false;
+                }
+
+                // Generate unique ID
+                const id = Date.now().toString();
+                
+                // Create vehicle object with spot assignment
+                const vehicle = {
+                    id: id,
+                    spotId: spotId,
+                    ownerName: vehicleData.ownerName,
+                    vehicleName: vehicleData.vehicleName,
+                    vehicleNumber: vehicleData.vehicleNumber.toUpperCase(),
+                    entryDate: vehicleData.entryDate,
+                    exitDate: vehicleData.exitDate || null,
+                    status: vehicleData.exitDate ? 'Exited' : 'Parked'
+                };
+
+                this.vehicles.push(vehicle);
+                
+                // Update occupied spots if vehicle is parked
+                if (vehicle.status === 'Parked') {
+                    this.occupiedSpots.add(spotId);
+                }
+                
+                this.saveData();
+                this.updateDisplay();
+                this.showAlert(`Vehicle successfully registered! Assigned to Spot #${spotId}`, 'success');
+                return true;
+            }
+
+            markVehicleExit(vehicleId, exitTime) {
+                const vehicle = this.vehicles.find(v => v.id === vehicleId);
+                if (vehicle) {
+                    vehicle.exitDate = exitTime;
+                    vehicle.status = 'Exited';
+                    
+                    // Free up the parking spot
+                    this.occupiedSpots.delete(vehicle.spotId);
+                    
+                    this.saveData();
+                    this.updateDisplay();
+                    this.showAlert(`Vehicle ${vehicle.vehicleNumber} has exited from Spot #${vehicle.spotId}`, 'info');
+                }
+            }
+
+            deleteVehicle(vehicleId) {
+                const vehicleIndex = this.vehicles.findIndex(v => v.id === vehicleId);
+                if (vehicleIndex > -1) {
+                    const vehicle = this.vehicles[vehicleIndex];
+                    
+                    // Free up parking spot if vehicle was parked
+                    if (vehicle.status === 'Parked') {
+                        this.occupiedSpots.delete(vehicle.spotId);
+                    }
+                    
+                    this.vehicles.splice(vehicleIndex, 1);
+                    this.saveData();
+                    this.updateDisplay();
+                    this.showAlert(`Vehicle record deleted successfully!`, 'success');
+                }
+            }
+
+            updateDisplay() {
+                this.updateStats();
+                this.updateVehicleTable();
+                this.initializeParkingGrid(); // Refresh parking grid
+            }
+
+            updateStats() {
+                const totalVehicles = this.vehicles.length;
+                const parkedVehicles = this.vehicles.filter(v => v.status === 'Parked').length;
+                const exitedToday = this.vehicles.filter(v => {
+                    if (!v.exitDate) return false;
+                    const exitDate = new Date(v.exitDate);
+                    const today = new Date();
+                    return exitDate.toDateString() === today.toDateString();
+                }).length;
+                const availableSpots = this.totalSpots - parkedVehicles;
+
+                document.getElementById('totalVehicles').textContent = totalVehicles;
+                document.getElementById('parkedVehicles').textContent = parkedVehicles;
+                document.getElementById('exitedVehicles').textContent = exitedToday;
+                document.getElementById('availableSpots').textContent = availableSpots;
+            }
+
+            updateVehicleTable() {
+                const tbody = document.getElementById('vehicleTableBody');
+                tbody.innerHTML = '';
+
+                const filteredVehicles = this.getFilteredVehicles();
+
+                if (filteredVehicles.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                                No vehicles found
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                filteredVehicles.forEach(vehicle => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="fw-medium">${vehicle.ownerName}</td>
+                        <td>${vehicle.vehicleName}</td>
+                        <td class="font-monospace fw-bold">${vehicle.vehicleNumber}</td>
+                        <td>
+                            <small class="text-muted d-block">Spot #${vehicle.spotId}</small>
+                            ${this.formatDateTime(vehicle.entryDate)}
+                        </td>
+                        <td>${vehicle.exitDate ? this.formatDateTime(vehicle.exitDate) : '<span class="text-muted">-</span>'}</td>
+                        <td>
+                            <span class="badge ${vehicle.status === 'Parked' ? 'bg-success' : 'bg-secondary'}">
+                                ${vehicle.status}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                ${vehicle.status === 'Parked' ? 
+                                    `<button class="btn btn-outline-warning" onclick="showExitModal('${vehicle.id}')" title="Mark Exit">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                    </button>` : ''
+                                }
+                                <button class="btn btn-outline-danger" onclick="deleteVehicleRecord('${vehicle.id}')" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            getFilteredVehicles() {
+                let filtered = [...this.vehicles];
+                
+                // Apply search filter
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                if (searchTerm) {
+                    filtered = filtered.filter(vehicle => 
+                        vehicle.ownerName.toLowerCase().includes(searchTerm) ||
+                        vehicle.vehicleName.toLowerCase().includes(searchTerm) ||
+                        vehicle.vehicleNumber.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                // Apply status filter
+                const statusFilter = document.getElementById('statusFilter').value;
+                if (statusFilter) {
+                    filtered = filtered.filter(vehicle => vehicle.status === statusFilter);
+                }
+                
+                // Sort by entry date (newest first)
+                filtered.sort((a, b) => new Date(b.entryDate) - new Date(a.entryDate));
+                
+                return filtered;
+            }
+
+            formatDateTime(dateTimeString) {
+                const date = new Date(dateTimeString);
+                return date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            setCurrentDateTime() {
+                const now = new Date();
+                const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                    .toISOString().slice(0, 16);
+                document.getElementById('entryDate').value = localDateTime;
+            }
+
+            showAlert(message, type) {
+                const alertContainer = document.getElementById('alertContainer');
+                const alertId = 'alert-' + Date.now();
+                
+                const alertHTML = `
+                    <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        <i class="fas ${this.getAlertIcon(type)} me-2"></i>
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                
+                alertContainer.innerHTML = alertHTML;
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    const alertElement = document.getElementById(alertId);
+                    if (alertElement) {
+                        const alert = new bootstrap.Alert(alertElement);
+                        alert.close();
+                    }
+                }, 5000);
+            }
+
+            getAlertIcon(type) {
+                const icons = {
+                    success: 'fa-check-circle',
+                    danger: 'fa-exclamation-triangle',
+                    warning: 'fa-exclamation-circle',
+                    info: 'fa-info-circle'
+                };
+                return icons[type] || 'fa-info-circle';
+            }
+
+            saveData() {
+                try {
+                    localStorage.setItem('parkingVehicles', JSON.stringify(this.vehicles));
+                } catch (error) {
+                    console.error('Error saving data:', error);
+                    this.showAlert('Error saving data to local storage!', 'danger');
+                }
+            }
+
+            exportData() {
+                if (this.vehicles.length === 0) {
+                    this.showAlert('No data to export!', 'warning');
+                    return;
+                }
+
+                const csvContent = this.convertToCSV(this.vehicles);
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `parking_records_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                this.showAlert('Data exported successfully!', 'success');
+            }
+
+            convertToCSV(data) {
+                const headers = ['Spot ID', 'Owner Name', 'Vehicle Name', 'Vehicle Number', 'Entry Date', 'Exit Date', 'Status'];
+                const csvRows = [headers.join(',')];
+                
+                data.forEach(vehicle => {
+                    const row = [
+                        vehicle.spotId,
+                        `"${vehicle.ownerName}"`,
+                        `"${vehicle.vehicleName}"`,
+                        vehicle.vehicleNumber,
+                        vehicle.entryDate,
+                        vehicle.exitDate || '',
+                        vehicle.status
+                    ];
+                    csvRows.push(row.join(','));
+                });
+                
+                return csvRows.join('\n');
+            }
+
+            clearAllData() {
+                if (confirm('Are you sure you want to clear all vehicle records? This action cannot be undone.')) {
+                    this.vehicles = [];
+                    this.occupiedSpots.clear();
+                    this.saveData();
+                    this.updateDisplay();
+                    this.showAlert('All vehicle records have been cleared!', 'info');
+                }
+            }
+        }
+
+        // Initialize parking manager
+        const parkingManager = new ParkingManager();
+
+        // Form handling
+        document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+            
+            const formData = {
+                ownerName: document.getElementById('ownerName').value.trim(),
+                vehicleName: document.getElementById('vehicleName').value.trim(),
+                vehicleNumber: document.getElementById('vehicleNumber').value.trim(),
+                entryDate: document.getElementById('entryDate').value,
+                exitDate: document.getElementById('exitDate').value
+            };
+            
+            if (parkingManager.addVehicle(formData)) {
+                clearForm();
+                this.classList.remove('was-validated');
+            }
+        });
+
+        // Modal handling for exit time
+        let currentVehicleId = null;
+
+        function showExitModal(vehicleId) {
+            currentVehicleId = vehicleId;
+            const now = new Date();
+            const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                .toISOString().slice(0, 16);
+            document.getElementById('modalExitTime').value = localDateTime;
+            
+            const modal = new bootstrap.Modal(document.getElementById('exitTimeModal'));
+            modal.show();
+        }
+
+        function confirmExit() {
+            const exitTime = document.getElementById('modalExitTime').value;
+            if (exitTime && currentVehicleId) {
+                parkingManager.markVehicleExit(currentVehicleId, exitTime);
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('exitTimeModal'));
+                modal.hide();
+                currentVehicleId = null;
+            }
+        }
+
+        // Utility functions
+        function clearForm() {
+            document.getElementById('vehicleForm').reset();
+            document.getElementById('vehicleForm').classList.remove('was-validated');
+            parkingManager.setCurrentDateTime();
+        }
+
+        function deleteVehicleRecord(vehicleId) {
+            if (confirm('Are you sure you want to delete this vehicle record?')) {
+                parkingManager.deleteVehicle(vehicleId);
+            }
+        }
+
+        function searchVehicles() {
+            parkingManager.updateVehicleTable();
+        }
+
+        function filterByStatus() {
+            parkingManager.updateVehicleTable();
+        }
+
+        // Auto-uppercase vehicle number input
+        document.getElementById('vehicleNumber').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    </script>
+</body>
+</html>
