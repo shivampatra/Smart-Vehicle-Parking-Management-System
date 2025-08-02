@@ -1,6 +1,6 @@
 # Smart-Vehicle-Parking-Management-System
 🚗 Smart Parking Zone - Modern vehicle management system with real-time spot assignment &amp; visual tracking. Features automated parking allocation (1-100 spots), interactive parking grid, search/filter, CSV export &amp; responsive design. Built with HTML5, CSS3, JavaScript &amp; Bootstrap. Zero setup required!
-
+Live Link : https://shivampatra.github.io/Smart-Vehicle-Parking-Management-System/
 🚗 Smart Parking Zone - Vehicle Management System
 Project Overview
   The Smart Parking Zone is a comprehensive, web-based vehicle management system designed to efficiently manage parking facilities with real-time spot assignment and tracking capabilities. This modern solution     provides automated parking space allocation, visual monitoring, and advanced analytics for parking lot operations.
